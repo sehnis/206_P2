@@ -67,20 +67,45 @@ def find_urls(input_text):
 ## Start with this page: https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All  
 ## End with this page: https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All&page=11 
 
+url_base = "https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All&page="
+directory_html = []
 
-
-
-
+def get_umsi_data():
+	## Check cache
+	umsi_id = "umsi_directory_data"
+	if umsi_id in CACHE_DICTION:
+		print("Using cached directory data.")
+	else:
+		for i in range(0, 12):
+			current_url = url_base + str(i)
+			## print(current_url)
+			current_html = requests.get(current_url, headers={'User-Agent': 'SI_CLASS'}).text 
+			directory_html.append(current_html)
+		## print(len(directory_html))
+		CACHE_DICTION[umsi_id] = directory_html
+		dict_file = open(CACHE_FNAME, "w")
+		dict_file.write(json.dumps(CACHE_DICTION))
+		dict_file.close()
+	return(CACHE_DICTION[umsi_id])
 
 
 ## PART 2 (b) - Create a dictionary saved in a variable umsi_titles 
 ## whose keys are UMSI people's names, and whose associated values are those people's titles, e.g. "PhD student" or "Associate Professor of Information"...
 
+directory_html = get_umsi_data()
+names = []
+titles = []
+umsi_titles = {}
 
+for html in directory_html:
+	soup = BeautifulSoup(html, "html.parser")
+	for name in soup.find_all('div', {'class':'field-name-title'}):
+		names.append(name.text)
+	for title in soup.find_all('div', {'class':'field-name-field-person-titles'}):
+		titles.append(title.text)
 
-
-
-
+umsi_titles = dict(zip(names, titles))
+print(umsi_titles)
 
 ## PART 3 (a) - Define a function get_five_tweets
 ## INPUT: Any string
