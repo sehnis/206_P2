@@ -76,6 +76,7 @@ def get_umsi_data():
 	if umsi_id in CACHE_DICTION:
 		print("Using cached directory data.")
 	else:
+		print("Finding new directory data.")
 		for i in range(0, 12):
 			current_url = url_base + str(i)
 			## print(current_url)
@@ -105,26 +106,46 @@ for html in directory_html:
 		titles.append(title.text)
 
 umsi_titles = dict(zip(names, titles))
-print(umsi_titles)
+## print(umsi_titles)
 
 ## PART 3 (a) - Define a function get_five_tweets
 ## INPUT: Any string
 ## Behavior: See instructions. Should search for the input string on twitter and get results. Should check for cached data, use it if possible, and if not, cache the data retrieved.
 ## RETURN VALUE: A list of strings: A list of just the text of 5 different tweets that result from the search.
 
+def get_five_tweets(to_find):
+	tweet_id = "twitter_{}".format(to_find)
+	if tweet_id in CACHE_DICTION:
+		tweet_content = CACHE_DICTION[tweet_id]
+		print("Using cached Twitter data for " + to_find)
+	else:
+		print("Finding new Twitter data for " + to_find)
+		twitter_data = api.search(q=to_find)
+		tweet_content = twitter_data["statuses"]
+		CACHE_DICTION[tweet_id] = tweet_content
+		twitter_file = open(CACHE_FNAME, "w")
+		twitter_file.write(json.dumps(CACHE_DICTION))
+		twitter_file.close()
 
+	five_tweets_content = []
+	for tweet in tweet_content[:5]:
+		five_tweets_content.append(tweet["text"])
+	return(five_tweets_content)
 
 
 ## PART 3 (b) - Write one line of code to invoke the get_five_tweets function with the phrase "University of Michigan" and save the result in a variable five_tweets.
 
-
-
+five_tweets = get_five_tweets("University of Michigan")
+## print(five_tweets)
 
 ## PART 3 (c) - Iterate over the five_tweets list, invoke the find_urls function that you defined in Part 1 on each element of the list, and accumulate a new list of each of the total URLs in all five of those tweets in a variable called tweet_urls_found. 
 
-
-
-
+tweet_urls_found = []
+for umich_text in five_tweets:
+	umich_urls = find_urls(umich_text)
+	for url in range(len(umich_urls)):
+		tweet_urls_found.append(umich_urls[url])
+## print(tweet_urls_found)
 
 ########### TESTS; DO NOT CHANGE ANY CODE BELOW THIS LINE! ###########
 
