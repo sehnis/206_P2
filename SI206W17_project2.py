@@ -1,8 +1,8 @@
 ## SI 206 W17 - Project 2 
 
 ## COMMENT HERE WITH:
-## Your name:
-## Anyone you worked with on this project:
+## Your name: Sam Ehnis-Clark
+## Anyone you worked with on this project: Just myself (sehnis)
 
 ## Below we have provided import statements, comments to separate out the parts of the project, instructions/hints/examples, and at the end, tests. See the PDF of instructions for more detail. 
 ## You can check out the SAMPLE206project2_caching.json for an example of what your cache file might look like.
@@ -14,6 +14,7 @@ import unittest
 import json
 import requests
 import tweepy
+import re
 import twitter_info # Requires you to have a twitter_info file in this directory
 from bs4 import BeautifulSoup
 
@@ -33,8 +34,15 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 
 ## Write the code to begin your caching pattern setup here.
 
+CACHE_FNAME = "206project2_caching.json"
 
-
+try:
+	cache_file = open(CACHE_FNAME, "r")
+	cache_contents = cache_file.read()
+	cache_file.close()
+	CACHE_DICTION = json.loads(cache_contents)
+except:
+	CACHE_DICTION = {}
 
 ## PART 1 - Define a function find_urls.
 ## INPUT: any string
@@ -45,11 +53,9 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 ## find_urls("I love looking at websites like http://etsy.com and http://instagram.com and stuff") should return ["http://etsy.com","http://instagram.com"]
 ## find_urls("the internet is awesome #worldwideweb") should return [], empty list
 
-
-
-
-
-
+def find_urls(input_text):
+	found_urls = re.findall(r'https?:\/\/[0-9A-z\./]\S+', input_text)
+	return found_urls
 
 ## PART 2 (a) - Define a function called get_umsi_data.
 ## INPUT: N/A. No input.
