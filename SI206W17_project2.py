@@ -54,7 +54,7 @@ except:
 ## find_urls("the internet is awesome #worldwideweb") should return [], empty list
 
 def find_urls(input_text):
-	found_urls = re.findall(r'https?:\/\/[0-9A-z\./]\S+', input_text)
+	found_urls = re.findall(r'https?:\/\/\w+\.[0-9A-z\./]*\w{2}[0-9A-z/]*', input_text)
 	return found_urls
 
 ## PART 2 (a) - Define a function called get_umsi_data.
